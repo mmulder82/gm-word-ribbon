@@ -243,13 +243,13 @@
         <bt:String id="GGM.Koptekst5.Label" DefaultValue="Koptekst 5" />
         <bt:String id="GGM.Koptekst6.Label" DefaultValue="Koptekst 6" />
         <bt:String id="GGM.KoptekstenGenummerd.Label" DefaultValue="Kopteksten genummerd" />
-        <bt:String id="GGM.Koptekst1Genummerd.Label" DefaultValue="Koptekst 1 (1.)" />
-        <bt:String id="GGM.Koptekst2Genummerd.Label" DefaultValue="Koptekst 2 (1.1)" />
-        <bt:String id="GGM.Koptekst3Genummerd.Label" DefaultValue="Koptekst 3 (1.1.1)" />
-        <bt:String id="GGM.Koptekst4Genummerd.Label" DefaultValue="Koptekst 4 (1.1.1.1)" />
+        <bt:String id="GGM.Koptekst1Genummerd.Label" DefaultValue="Koptekst 1" />
+        <bt:String id="GGM.Koptekst2Genummerd.Label" DefaultValue="Koptekst 2" />
+        <bt:String id="GGM.Koptekst3Genummerd.Label" DefaultValue="Koptekst 3" />
+        <bt:String id="GGM.Koptekst4Genummerd.Label" DefaultValue="Koptekst 4" />
         <bt:String id="GGM.Instellen.Label" DefaultValue="Instellen" />
         <bt:String id="GGM.StijlenInstalleren.Label" DefaultValue="Stijlen installeren" />
-        <bt:String id="GGM.Vernummeren.Label" DefaultValue="Vernummeren" />
+        <bt:String id="GGM.Vernummeren.Label" DefaultValue="Opschonen" />
         <bt:String id="GGM.Help.Label" DefaultValue="Help" />
       </bt:ShortStrings>
       <bt:LongStrings>
@@ -257,10 +257,10 @@
         <bt:String id="GGM.OpenTaskpane.Tooltip" DefaultValue="Open het taakvenster met dezelfde knoppen." />
         <bt:String id="GGM.Titel.Tooltip" DefaultValue="Pas de Titel-stijl toe (Corbel 18 vet)." />
         <bt:String id="GGM.Standaardtekst.Tooltip" DefaultValue="Pas de standaardtekststijl toe (Corbel 11)." />
-        <bt:String id="GGM.Kopteksten.Tooltip" DefaultValue="Pas een koptekststijl toe, zonder automatische nummering." />
-        <bt:String id="GGM.KoptekstenGenummerd.Tooltip" DefaultValue="Pas een koptekststijl toe mét automatische nummering (1. / 1.1 / 1.1.1 / 1.1.1.1)." />
+        <bt:String id="GGM.Kopteksten.Tooltip" DefaultValue="Pas een koptekststijl toe, zonder nummering." />
+        <bt:String id="GGM.KoptekstenGenummerd.Tooltip" DefaultValue="Pas een koptekststijl toe mét Word's eigen, automatisch bijgewerkte nummering (elk niveau telt onafhankelijk: 1., 2., 3., ...)." />
         <bt:String id="GGM.StijlenInstalleren.Tooltip" DefaultValue="Installeer/herstel de gemeentelijke stijlen in dit document (gebeurt ook automatisch bij eerste gebruik van een stijlknop)." />
-        <bt:String id="GGM.Vernummeren.Tooltip" DefaultValue="Werk de nummering (1. / 1.1 / 1.1.1 / 1.1.1.1) in het hele document bij - gebruik dit na het verplaatsen of verwijderen van kopteksten." />
+        <bt:String id="GGM.Vernummeren.Tooltip" DefaultValue="Opschonen: verwijdert oude, met de hand getypte nummers uit een eerdere versie van dit tabblad. Voor nieuwe genummerde kopteksten hoef je dit niet te gebruiken - die telt Word zelf automatisch bij." />
         <bt:String id="GGM.Help.Tooltip" DefaultValue="Open het taakvenster met uitleg over alle knoppen." />
       </bt:LongStrings>
     </Resources>

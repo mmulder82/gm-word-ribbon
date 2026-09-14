@@ -50,13 +50,25 @@
 // color/emphasis, so only `font.name` is overridden for this group - see
 // MISC_BUILTIN_STYLE_NAMES below.
 //
-// The numbered look for Koptekst 1-4 (1. / 1.1 / 1.1.1 / 1.1.1.1) still
-// has no equivalent in the Word JS API (no supported way to link a style
-// to a multilevel-list definition), so it's computed by this add-in and
-// written as literal prefix text at the start of the paragraph,
-// recalculated for the whole document whenever a numbered style is
-// applied. That means moving, deleting or copy/pasting numbered headings
-// doesn't renumber the rest on its own - use "Vernummeren" after that.
+// v4.4 (14 sep) - Koptekst 1-4 genummerd switched from a computed text
+// prefix to Word's own native numbering (Word.List), after Mark asked to
+// use Word's built-in numbering and, once told what that actually means
+// (see below), explicitly chose this trade-off. Numbering is now "live":
+// Word renumbers itself when headings are added, removed, reordered or
+// copy/pasted - no more "Vernummeren" needed for that.
+// The catch, confirmed while implementing this rather than assumed: the
+// Word JavaScript API has no supported way to make one list level's
+// number include its parent levels' numbers (the "1.1.1" legal/outline
+// style) - `Word.List.setLevelNumbering()` only controls a level's own,
+// independent counter format (arabic/roman/letter). So each of Koptekst
+// 1-4 genummerd now gets its own separate, independent counter (its own
+// "1.", "2.", "3.", ...) rather than the originally-specified "1." / "1.1"
+// / "1.1.1" / "1.1.1.1" notation - Mark accepted this in exchange for
+// live numbering. "Vernummeren" is repurposed as a one-time cleanup: it
+// strips any leftover text-prefix numbering a document may still have
+// from before this change (see GGM.vernummeren below); it's not needed
+// for numbering created after this version, Word keeps that current on
+// its own.
 // ---------------------------------------------------------------------------
 
 const GGM = {};
@@ -103,19 +115,11 @@ const KOPTEKST_GENUMMERD_NAMES = {
   4: "Koptekst 4 genummerd",
 };
 
-// Same font per level as the un-numbered Koptekst - only the numbering is
-// different, per Mark's spec: level 1 gets a trailing period ("1."),
-// levels 2-4 don't ("1.1", "1.1.1", "1.1.1.1").
-function numberedPrefix(counters, level) {
-  if (level === 1) {
-    return `${counters[0]}.`;
-  }
-  return counters.slice(0, level).join(".");
-}
-
-// Matches a numbering prefix this add-in previously inserted (levels 1-4:
-// "1.", "1.1", "1.1.1", "1.1.1.1"), followed by a tab, so it can be
-// stripped and recomputed cleanly.
+// Matches the plain-text numbering prefix this add-in inserted before
+// v4.4 (levels 1-4: "1.", "1.1", "1.1.1", "1.1.1.1"), followed by a tab -
+// used only to clean up documents from that older approach; numbering
+// created by v4.4+ is native Word numbering, not text, so there is
+// nothing for this pattern to match there.
 const NUMBERED_PREFIX_RE = /^\d+(\.\d+){0,3}\.?\t/;
 
 // -- Style creation / (re)application ----------------------------------------
@@ -267,9 +271,10 @@ GGM.stijlenInstalleren = async function () {
   });
 };
 
-/** Strip a leftover numbering prefix from the current selection's text, if
- *  any (used when switching a paragraph to a style that isn't numbered). */
-async function stripPrefixFromSelection(context) {
+/** Strip a leftover pre-v4.4 text numbering prefix from the current
+ *  selection's text, if any (used when switching a paragraph to a style
+ *  that isn't numbered, or re-applying a numbered one). */
+async function stripLeftoverPrefixText(context) {
   const selection = context.document.getSelection();
   selection.load("text");
   await context.sync();
@@ -277,6 +282,22 @@ async function stripPrefixFromSelection(context) {
   if (bareText !== selection.text) {
     selection.insertText(bareText, Word.InsertLocation.replace);
     await context.sync();
+  }
+}
+
+/** Detach the current selection's first paragraph from any native Word
+ *  list it's part of (see GGM.applyKoptekstGenummerd below), so switching
+ *  a numbered heading to a non-numbered style doesn't leave a dangling
+ *  number in front of it. Safe to call on a paragraph that isn't in a
+ *  list. Try/caught defensively, same reasoning as neutralizeBuiltInStyle
+ *  above: this must never block the style/font change around it. */
+async function detachSelectionFromList(context) {
+  try {
+    context.document.getSelection().paragraphs.getFirst().detachFromList();
+    await context.sync();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error("Kon nummering niet loskoppelen van de selectie:", e);
   }
 }
 
@@ -296,7 +317,8 @@ async function applyDirectFont(context, font) {
 GGM.titel = async function () {
   await Word.run(async (context) => {
     await ensureStyle(context, TITEL_STYLE, TITEL_SPEC);
-    await stripPrefixFromSelection(context);
+    await stripLeftoverPrefixText(context);
+    await detachSelectionFromList(context);
     context.document.getSelection().style = TITEL_STYLE;
     await context.sync();
     await applyDirectFont(context, TITEL_SPEC);
@@ -306,7 +328,8 @@ GGM.titel = async function () {
 GGM.standaardtekst = async function () {
   await Word.run(async (context) => {
     await ensureStyle(context, STANDAARD_STYLE, STANDAARD_SPEC);
-    await stripPrefixFromSelection(context);
+    await stripLeftoverPrefixText(context);
+    await detachSelectionFromList(context);
     context.document.getSelection().style = STANDAARD_STYLE;
     await context.sync();
     await applyDirectFont(context, STANDAARD_SPEC);
@@ -320,7 +343,8 @@ GGM.applyKoptekst = async function (level) {
   const font = KOPTEKST_SPECS[level];
   await Word.run(async (context) => {
     await ensureStyle(context, name, font);
-    await stripPrefixFromSelection(context);
+    await stripLeftoverPrefixText(context);
+    await detachSelectionFromList(context);
     context.document.getSelection().style = name;
     await context.sync();
     await applyDirectFont(context, font);
@@ -335,17 +359,67 @@ GGM.koptekst5 = async function () { await GGM.applyKoptekst(5); };
 GGM.koptekst6 = async function () { await GGM.applyKoptekst(6); };
 
 // -- Kopteksten met nummering --------------------------------------------------
+// Elk niveau (Koptekst 1-4 genummerd) heeft zijn eigen, onafhankelijke
+// Word.List: alle paragrafen met dat niveau's stijl delen die ene lijst,
+// zodat de teller binnen dat niveau doorloopt door het hele document.
+// Zie de v4.4-toelichting bovenaan: dit is Word's eigen, "levende"
+// nummering, geen door de add-in berekende tekst meer.
+
+/** Find the id of an existing Word.List already used elsewhere in the
+ *  document for this heading style, if any - so a newly (re)styled
+ *  paragraph joins the same running count instead of starting its own.
+ *  Returns null if this style doesn't have a list yet anywhere. */
+async function findExistingListId(context, styleName) {
+  const paragraphs = context.document.body.paragraphs;
+  paragraphs.load("style,listOrNullObject/id,listOrNullObject/isNullObject");
+  await context.sync();
+
+  for (let i = 0; i < paragraphs.items.length; i++) {
+    const p = paragraphs.items[i];
+    if (p.style === styleName && !p.listOrNullObject.isNullObject) {
+      return p.listOrNullObject.id;
+    }
+  }
+  return null;
+}
+
+/** Attach the current selection's first paragraph to this heading level's
+ *  native numbered list - reusing the one other paragraphs of the same
+ *  style already use, or starting a new one (arabic numbering, e.g.
+ *  "1.", "2.", "3.", ...) if this is the first paragraph anywhere in the
+ *  document with this style. Try/caught, same reasoning as
+ *  neutralizeBuiltInStyle above: this is new, not-yet-live-tested API
+ *  usage (Word.List), so a failure here must never block applyDirectFont
+ *  afterwards - the heading should still visibly get the right style and
+ *  font even if the native numbering itself doesn't take. */
+async function attachSelectionToNumberedList(context, styleName) {
+  try {
+    const existingListId = await findExistingListId(context, styleName);
+    const target = context.document.getSelection().paragraphs.getFirst();
+    if (existingListId !== null) {
+      target.attachToList(existingListId, 0);
+    } else {
+      const list = target.startNewList();
+      list.setLevelNumbering(0, Word.ListNumbering.arabic);
+    }
+    await context.sync();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error("Kon '" + styleName + "' niet aan de automatische nummering koppelen:", e);
+  }
+}
 
 GGM.applyKoptekstGenummerd = async function (level) {
   const name = KOPTEKST_GENUMMERD_NAMES[level];
   const font = KOPTEKST_SPECS[level];
   await Word.run(async (context) => {
     await ensureStyle(context, name, font);
+    await stripLeftoverPrefixText(context);
     context.document.getSelection().style = name;
     await context.sync();
+    await attachSelectionToNumberedList(context, name);
     await applyDirectFont(context, font);
   });
-  await GGM.renumber();
 };
 
 GGM.koptekst1Genummerd = async function () { await GGM.applyKoptekstGenummerd(1); };
@@ -353,49 +427,26 @@ GGM.koptekst2Genummerd = async function () { await GGM.applyKoptekstGenummerd(2)
 GGM.koptekst3Genummerd = async function () { await GGM.applyKoptekstGenummerd(3); };
 GGM.koptekst4Genummerd = async function () { await GGM.applyKoptekstGenummerd(4); };
 
-/** Recompute and rewrite the 1. / 1.1 / 1.1.1 / 1.1.1.1 prefixes for every
- *  paragraph in the document, in document order. Paragraphs that no longer
- *  carry a numbered Koptekst style have any leftover prefix removed. */
-GGM.renumber = async function () {
+/** One-time cleanup for documents that still carry the old, pre-v4.4 text
+ *  numbering (a literal "1." / "1.1" / ... prefix, see NUMBERED_PREFIX_RE)
+ *  - strips it from every paragraph in the document. Not needed for
+ *  numbering created by v4.4+: that's native Word numbering and Word
+ *  keeps it current on its own, without any button. */
+GGM.vernummeren = async function () {
   await Word.run(async (context) => {
-    const levelByStyleName = {};
-    for (const level of [1, 2, 3, 4]) {
-      levelByStyleName[KOPTEKST_GENUMMERD_NAMES[level]] = level;
-    }
-
     const paragraphs = context.document.body.paragraphs;
-    paragraphs.load("style,text");
+    paragraphs.load("text");
     await context.sync();
-
-    const counters = [0, 0, 0, 0];
 
     paragraphs.items.forEach((p) => {
       const bareText = p.text.replace(NUMBERED_PREFIX_RE, "");
-      const level = levelByStyleName[p.style];
-
-      if (!level) {
-        if (bareText !== p.text) {
-          p.insertText(bareText, Word.InsertLocation.replace);
-        }
-        return;
-      }
-
-      counters[level - 1] += 1;
-      for (let i = level; i < counters.length; i++) counters[i] = 0;
-      const prefix = numberedPrefix(counters, level);
-
-      const newText = `${prefix}\t${bareText}`;
-      if (newText !== p.text) {
-        p.insertText(newText, Word.InsertLocation.replace);
+      if (bareText !== p.text) {
+        p.insertText(bareText, Word.InsertLocation.replace);
       }
     });
 
     await context.sync();
   });
-};
-
-GGM.vernummeren = async function () {
-  await GGM.renumber();
 };
 
 // Expose to global scope for plain <script> consumption (no bundler/module

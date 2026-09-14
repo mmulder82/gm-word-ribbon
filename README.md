@@ -37,10 +37,14 @@ Standaardtekst blijft zwart:
 | Koptekst 4 | Corbel 11, vet | #441D42 | - |
 | Koptekst 5 | Corbel 11, cursief | #441D42 | - |
 | Koptekst 6 | Corbel 11 (geen extra opmaak) | #441D42 | - |
-| Koptekst 1 genummerd | Corbel 16, vet | #441D42 | `1.` |
-| Koptekst 2 genummerd | Corbel 14, vet | #441D42 | `1.1` |
-| Koptekst 3 genummerd | Corbel 12, vet | #441D42 | `1.1.1` |
-| Koptekst 4 genummerd | Corbel 11, vet | #441D42 | `1.1.1.1` |
+| Koptekst 1 genummerd | Corbel 16, vet | #441D42 | eigen teller (1., 2., 3., ...) |
+| Koptekst 2 genummerd | Corbel 14, vet | #441D42 | eigen teller (1., 2., 3., ...) |
+| Koptekst 3 genummerd | Corbel 12, vet | #441D42 | eigen teller (1., 2., 3., ...) |
+| Koptekst 4 genummerd | Corbel 11, vet | #441D42 | eigen teller (1., 2., 3., ...) |
+
+Elk genummerd niveau telt **onafhankelijk** - Koptekst 2 genummerd loopt dus
+niet "1.1, 1.2, ..." mee met Koptekst 1, maar heeft zijn eigen reeks
+"1., 2., 3., ...". Zie hieronder waarom.
 
 ## Hoe de stijlen en de nummering werken
 
@@ -75,15 +79,29 @@ Deze v4-versie vermijdt beide problemen bewust:
 - **Elke stijlknop herstelt de opmaak bij elk gebruik**, niet alleen de
   eerste keer - een stijl die al bestond maar verkeerd was opgemaakt wordt
   dus gewoon gecorrigeerd in plaats van overgeslagen.
-- De nummering (`1.` / `1.1` / `1.1.1` / `1.1.1.1`) is **geen "levende"
-  Word-multilevel-lijst** - Word's JavaScript API biedt geen ondersteunde
-  manier om een stijl aan een eigen multilevel-lijstdefinitie te koppelen.
-  De add-in berekent het nummer zelf en zet het als platte tekst + tab
-  vooraan de alinea, opnieuw voor het hele document elke keer dat je een
-  genummerde knop gebruikt. Kopteksten verplaatsen, verwijderen of
-  kopiëren/plakken betekent dus: klik daarna op **"Vernummeren"** (in het
-  tabblad of het taakvenster) om de nummers weer kloppend te maken - dat
-  gebeurt niet vanzelf zoals bij Word's ingebouwde outline-nummering.
+- **De nummering is sinds v4.4 Word's eigen, "levende" nummering**
+  (`Word.List`), niet meer door de add-in berekende platte tekst. Word
+  telt zelf automatisch bij zodra je een genummerde koptekst toevoegt,
+  verplaatst, verwijdert of kopieert/plakt - er is dus geen "Vernummeren"
+  meer nodig om de nummers kloppend te houden.
+  - **Beperking, eerlijk gezegd:** Word's JavaScript API heeft geen
+    ondersteunde manier om een lijstniveau de nummers van de niveaus erboven
+    te laten meetonen (de "1.1.1"-notatie met het bovenliggende nummer
+    erin) - `Word.List.setLevelNumbering()` stelt alleen het format van
+    een niveau's éígen, onafhankelijke teller in (arabisch/Romeins/
+    letters). Dit is oorspronkelijk gevraagd als "1." / "1.1" / "1.1.1" /
+    "1.1.1.1", maar dat concatenerende format is niet haalbaar via deze
+    API. Koptekst 1 t/m 4 genummerd hebben daarom elk hun eigen,
+    onafhankelijke teller ("1.", "2.", "3.", ...) - een bewuste,
+    afgesproken trade-off voor automatische/levende nummering.
+  - Elk niveau (1-4) heeft zijn eigen `Word.List` in het document; alle
+    paragrafen met dat niveau's stijl delen die ene lijst, zodat de teller
+    voor dat niveau doorloopt door het hele document.
+  - **"Opschonen"** (voorheen "Vernummeren") is alleen nog een
+    eenmalige opruimknop voor documenten die nog genummerd zijn met de
+    oude, vóór-v4.4 aanpak (letterlijke getypte nummers) - die worden
+    ermee verwijderd. Voor nieuwe nummering, gemaakt met deze versie, is
+    hij niet nodig.
 
 ## Word's eigen stijlen (Normaal, Kop 1-9, ...) neutraliseren
 
