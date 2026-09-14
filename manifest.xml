@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp
+    xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+    xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+    xsi:type="TaskPaneApp">
+
+  <!--
+    Hosting-URL: https://mmulder82.github.io/gm-word-ribbon
+    (afgeleid van de repo https://github.com/mmulder82/gm-word-ribbon/,
+    ervan uitgaande dat GitHub Pages aanstaat voor deze repo, met de bron op
+    de main-branch, map "/ (root)" - zie README.md, stap "Hosten op GitHub
+    Pages". Zet je Pages ergens anders (andere branch/submap, custom domain),
+    pas dan alle mmulder82.github.io/gm-word-ribbon-verwijzingen hieronder aan.
+
+    v4 (14 sep): bewust kleine rebuild. Alleen nog: Titel, Standaardtekst,
+    Koptekst 1-6 (zonder nummering) en Koptekst 1-4 (met nummering).
+    Klembord, Tabelstijlen, Taal, Bijhouden en Bijlage zijn eruit - zie
+    README.md voor de reden.
+  -->
+
+  <Id>b6f1a6e0-6c9a-4b7a-9b1a-5b6f9e2b7c11</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>Gemeente Gooise Meren</ProviderName>
+  <DefaultLocale>nl-NL</DefaultLocale>
+  <DisplayName DefaultValue="Gemeente Gooise Meren" />
+  <Description DefaultValue="Gemeentelijke tekststijlen (titel, kopteksten, standaardtekst) voor Word, ook in Word Online." />
+  <IconUrl DefaultValue="https://mmulder82.github.io/gm-word-ribbon/assets/icon-32.png" />
+  <HighResolutionIconUrl DefaultValue="https://mmulder82.github.io/gm-word-ribbon/assets/icon-80.png" />
+  <SupportUrl DefaultValue="https://mmulder82.github.io/gm-word-ribbon/" />
+
+  <AppDomains>
+    <AppDomain>https://mmulder82.github.io/gm-word-ribbon</AppDomain>
+  </AppDomains>
+
+  <Hosts>
+    <Host Name="Document" />
+  </Hosts>
+
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://mmulder82.github.io/gm-word-ribbon/src/taskpane/taskpane.html" />
+  </DefaultSettings>
+
+  <Permissions>ReadWriteDocument</Permissions>
+
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Requirements>
+      <Sets DefaultMinVersion="1.3">
+        <Set Name="WordApi" MinVersion="1.3" />
+      </Sets>
+    </Requirements>
+
+    <Hosts>
+      <Host xsi:type="Document">
+        <DesktopFormFactor>
+          <GetStarted>
+            <Title resid="GetStarted.Title" />
+            <Description resid="GetStarted.Description" />
+            <LearnMoreUrl resid="GetStarted.LearnMoreUrl" />
+          </GetStarted>
+
+          <FunctionFile resid="Commands.Url" />
+
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <OfficeTab id="TabHome">
+              <Group id="GGM.QuickGroup">
+                <Label resid="GGM.QuickGroup.Label" />
+                <Icon>
+                  <bt:Image size="16" resid="Icon.16" />
+                  <bt:Image size="32" resid="Icon.32" />
+                  <bt:Image size="80" resid="Icon.80" />
+                </Icon>
+                <Control xsi:type="Button" id="GGM.OpenTaskpane">
+                  <Label resid="GGM.OpenTaskpane.Label" />
+                  <Supertip>
+                    <Title resid="GGM.OpenTaskpane.Label" />
+                    <Description resid="GGM.OpenTaskpane.Tooltip" />
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16" />
+                    <bt:Image size="32" resid="Icon.32" />
+                    <bt:Image size="80" resid="Icon.80" />
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>GGM.Taskpane</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url" />
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+
+            <CustomTab id="GGM.Tab">
+              <Label resid="GGM.Tab.Label" />
+
+              <!-- Titel / Standaardtekst -->
+              <Group id="GGM.Tekststijlen">
+                <Label resid="GGM.Tekststijlen.Label" />
+                <Icon><bt:Image size="16" resid="Icon.16" /><bt:Image size="32" resid="Icon.32" /><bt:Image size="80" resid="Icon.80" /></Icon>
+                <Control xsi:type="Button" id="GGM.Titel">
+                  <Label resid="GGM.Titel.Label" />
+                  <Supertip><Title resid="GGM.Titel.Label" /><Description resid="GGM.Titel.Tooltip" /></Supertip>
+                  <Icon><bt:Image size="16" resid="Icon.16" /><bt:Image size="32" resid="Icon.32" /><bt:Image size="80" resid="Icon.80" /></Icon>
+                  <Action xsi:type="ExecuteFunction"><FunctionName>actionTitel</FunctionName></Action>
+                </Control>
+                <Control xsi:type="Button" id="GGM.Standaardtekst">
+                  <Label resid="GGM.Standaardtekst.Label" />
+                  <Supertip><Title resid="GGM.Standaardtekst.Label" /><Description resid="GGM.Standaardtekst.Tooltip" /></Supertip>
+                  <Icon><bt:Image size="16" resid="Icon.16" /><bt:Image size="32" resid="Icon.32" /><bt:Image size="80" resid="Icon.80" /></Icon>
+                  <Action xsi:type="ExecuteFunction"><FunctionName>actionStandaardtekst</FunctionName></Action>
+                </Control>
+              </Group>
+
+              <!-- Kopteksten zonder nummering -->
+              <Group id="GGM.Kopteksten">
+                <Label resid="GGM.Kopteksten.Label" />
+                <Icon><bt:Image size="16" resid="Icon.16" /><bt:Image size="32" resid="Icon.32" /><bt:Image size="80" resid="Icon.80" /></Icon>
+                <Control xsi:type="Button" id="GGM.Koptekst1">
+                  <Label resid="GGM.Koptekst1.Label" />
+                  <Supertip><Title resid="GGM.Koptekst1.Label" /><Description resid="GGM.Kopteksten.Tooltip" /></Supertip>
+                  <Icon><bt:Image size="16" resid="Icon.16" /><bt:Image size="32" resid="Icon.32" /><bt:Image size="80" resid="Icon.80" /></Icon>
+                  <Action xsi:type="ExecuteFunction"><FunctionName>actionKoptekst1</FunctionName></Action>
+                </Control>
+                <Control xsi:type="Button" id="GGM.Koptekst2">
+                  <Label resid="GGM.Koptekst2.Label" />
+                  <Supertip><Title resid="GGM.Koptekst2.Label" /><Description resid="GGM.Kopteksten.Tooltip" /></Supertip>
+                  <Icon><bt:Image size="16" resid="Icon.16" /><bt:Image size="32" resid="Icon.32" /><bt:Image size="80" resid="Icon.80" /></Icon>
+                  <Action xsi:type="ExecuteFunction"><FunctionName>actionKoptekst2</FunctionName></Action>
+                </Control>
+                <Control xsi:type="Button" id="GGM.Koptekst3">
+                  <Label resid="GGM.Koptekst3.Label" />
+                  <Supertip><Title resid="GGM.Koptekst3.Label" /><Description resid="GGM.Kopteksten.Tooltip" /></Supertip>
+                  <Icon><bt:Image size="16" resid="Icon.16" /><bt:Image size="32" resid="Icon.32" /><bt:Image size="80" resid="Icon.80" /></Icon>
+                  <Action xsi:type="ExecuteFunction"><FunctionName>actionKoptekst3</FunctionName></Action>
+                </Control>
+                <Control xsi:type="Button" id="GGM.Koptekst4">
+                  <Label resid="GGM.Koptekst4.Label" />
+                  <Supertip><Title resid="GGM.Koptekst4.Label" /><Description resid="GGM.Kopteksten.Tooltip" /></Supertip>
+                  <Icon><bt:Image size="16" resid="Icon.16" /><bt:Image size="32" resid="Icon.32" /><bt:Image size="80" resid="Icon.80" /></Icon>
+                  <Action xsi:type="ExecuteFunction"><FunctionName>actionKoptekst4</FunctionName></Action>
+                </Control>
+                <Control xsi:type="Button" id="GGM.Koptekst5">
+                  <Label resid="GGM.Koptekst5.Label" />
+                  <Supertip><Title resid="GGM.Koptekst5.Label" /><Description resid="GGM.Kopteksten.Tooltip" /></Supertip>
+                  <Icon><bt:Image size="16" resid="Icon.16" /><bt:Image size="32" resid="Icon.32" /><bt:Image size="80" resid="Icon.80" /></Icon>
+                  <Action xsi:type="ExecuteFunction"><FunctionName>actionKoptekst5</FunctionName></Action>
+                </Control>
+                <Control xsi:type="Button" id="GGM.Koptekst6">
+                  <Label resid="GGM.Koptekst6.Label" />
+                  <Supertip><Title resid="GGM.Koptekst6.Label" /><Description resid="GGM.Kopteksten.Tooltip" /></Supertip>
+                  <Icon><bt:Image size="16" resid="Icon.16" /><bt:Image size="32" resid="Icon.32" /><bt:Image size="80" resid="Icon.80" /></Icon>
+                  <Action xsi:type="ExecuteFunction"><FunctionName>actionKoptekst6</FunctionName></Action>
+                </Control>
+              </Group>
+
+              <!-- Kopteksten met nummering -->
+              <Group id="GGM.KoptekstenGenummerd">
+                <Label resid="GGM.KoptekstenGenummerd.Label" />
+                <Icon><bt:Image size="16" resid="Icon.16" /><bt:Image size="32" resid="Icon.32" /><bt:Image size="80" resid="Icon.80" /></Icon>
+                <Control xsi:type="Button" id="GGM.Koptekst1Genummerd">
+                  <Label resid="GGM.Koptekst1Genummerd.Label" />
+                  <Supertip><Title resid="GGM.Koptekst1Genummerd.Label" /><Description resid="GGM.KoptekstenGenummerd.Tooltip" /></Supertip>
+                  <Icon><bt:Image size="16" resid="Icon.16" /><bt:Image size="32" resid="Icon.32" /><bt:Image size="80" resid="Icon.80" /></Icon>
+                  <Action xsi:type="ExecuteFunction"><FunctionName>actionKoptekst1Genummerd</FunctionName></Action>
+                </Control>
+                <Control xsi:type="Button" id="GGM.Koptekst2Genummerd">
+                  <Label resid="GGM.Koptekst2Genummerd.Label" />
+                  <Supertip><Title resid="GGM.Koptekst2Genummerd.Label" /><Description resid="GGM.KoptekstenGenummerd.Tooltip" /></Supertip>
+                  <Icon><bt:Image size="16" resid="Icon.16" /><bt:Image size="32" resid="Icon.32" /><bt:Image size="80" resid="Icon.80" /></Icon>
+                  <Action xsi:type="ExecuteFunction"><FunctionName>actionKoptekst2Genummerd</FunctionName></Action>
+                </Control>
+                <Control xsi:type="Button" id="GGM.Koptekst3Genummerd">
+                  <Label resid="GGM.Koptekst3Genummerd.Label" />
+                  <Supertip><Title resid="GGM.Koptekst3Genummerd.Label" /><Description resid="GGM.KoptekstenGenummerd.Tooltip" /></Supertip>
+                  <Icon><bt:Image size="16" resid="Icon.16" /><bt:Image size="32" resid="Icon.32" /><bt:Image size="80" resid="Icon.80" /></Icon>
+                  <Action xsi:type="ExecuteFunction"><FunctionName>actionKoptekst3Genummerd</FunctionName></Action>
+                </Control>
+                <Control xsi:type="Button" id="GGM.Koptekst4Genummerd">
+                  <Label resid="GGM.Koptekst4Genummerd.Label" />
+                  <Supertip><Title resid="GGM.Koptekst4Genummerd.Label" /><Description resid="GGM.KoptekstenGenummerd.Tooltip" /></Supertip>
+                  <Icon><bt:Image size="16" resid="Icon.16" /><bt:Image size="32" resid="Icon.32" /><bt:Image size="80" resid="Icon.80" /></Icon>
+                  <Action xsi:type="ExecuteFunction"><FunctionName>actionKoptekst4Genummerd</FunctionName></Action>
+                </Control>
+              </Group>
+
+              <!-- Instellen -->
+              <Group id="GGM.Instellen">
+                <Label resid="GGM.Instellen.Label" />
+                <Icon><bt:Image size="16" resid="Icon.16" /><bt:Image size="32" resid="Icon.32" /><bt:Image size="80" resid="Icon.80" /></Icon>
+                <Control xsi:type="Button" id="GGM.StijlenInstalleren">
+                  <Label resid="GGM.StijlenInstalleren.Label" />
+                  <Supertip><Title resid="GGM.StijlenInstalleren.Label" /><Description resid="GGM.StijlenInstalleren.Tooltip" /></Supertip>
+                  <Icon><bt:Image size="16" resid="Icon.16" /><bt:Image size="32" resid="Icon.32" /><bt:Image size="80" resid="Icon.80" /></Icon>
+                  <Action xsi:type="ExecuteFunction"><FunctionName>actionStijlenInstalleren</FunctionName></Action>
+                </Control>
+                <Control xsi:type="Button" id="GGM.Vernummeren">
+                  <Label resid="GGM.Vernummeren.Label" />
+                  <Supertip><Title resid="GGM.Vernummeren.Label" /><Description resid="GGM.Vernummeren.Tooltip" /></Supertip>
+                  <Icon><bt:Image size="16" resid="Icon.16" /><bt:Image size="32" resid="Icon.32" /><bt:Image size="80" resid="Icon.80" /></Icon>
+                  <Action xsi:type="ExecuteFunction"><FunctionName>actionVernummeren</FunctionName></Action>
+                </Control>
+                <Control xsi:type="Button" id="GGM.Help">
+                  <Label resid="GGM.Help.Label" />
+                  <Supertip><Title resid="GGM.Help.Label" /><Description resid="GGM.Help.Tooltip" /></Supertip>
+                  <Icon><bt:Image size="16" resid="Icon.16" /><bt:Image size="32" resid="Icon.32" /><bt:Image size="80" resid="Icon.80" /></Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>GGM.Taskpane</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url" />
+                  </Action>
+                </Control>
+              </Group>
+
+            </CustomTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon.16" DefaultValue="https://mmulder82.github.io/gm-word-ribbon/assets/icon-16.png" />
+        <bt:Image id="Icon.32" DefaultValue="https://mmulder82.github.io/gm-word-ribbon/assets/icon-32.png" />
+        <bt:Image id="Icon.80" DefaultValue="https://mmulder82.github.io/gm-word-ribbon/assets/icon-80.png" />
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="Commands.Url" DefaultValue="https://mmulder82.github.io/gm-word-ribbon/src/commands/commands.html" />
+        <bt:Url id="Taskpane.Url" DefaultValue="https://mmulder82.github.io/gm-word-ribbon/src/taskpane/taskpane.html" />
+        <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://mmulder82.github.io/gm-word-ribbon/" />
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="GetStarted.Title" DefaultValue="Gemeente Gooise Meren is geïnstalleerd" />
+        <bt:String id="GGM.QuickGroup.Label" DefaultValue="Gemeente" />
+        <bt:String id="GGM.OpenTaskpane.Label" DefaultValue="Gemeente-opties" />
+        <bt:String id="GGM.Tab.Label" DefaultValue="Gemeente Gooise Meren" />
+        <bt:String id="GGM.Tekststijlen.Label" DefaultValue="Tekststijlen" />
+        <bt:String id="GGM.Titel.Label" DefaultValue="Titel" />
+        <bt:String id="GGM.Standaardtekst.Label" DefaultValue="Standaardtekst" />
+        <bt:String id="GGM.Kopteksten.Label" DefaultValue="Kopteksten" />
+        <bt:String id="GGM.Koptekst1.Label" DefaultValue="Koptekst 1" />
+        <bt:String id="GGM.Koptekst2.Label" DefaultValue="Koptekst 2" />
+        <bt:String id="GGM.Koptekst3.Label" DefaultValue="Koptekst 3" />
+        <bt:String id="GGM.Koptekst4.Label" DefaultValue="Koptekst 4" />
+        <bt:String id="GGM.Koptekst5.Label" DefaultValue="Koptekst 5" />
+        <bt:String id="GGM.Koptekst6.Label" DefaultValue="Koptekst 6" />
+        <bt:String id="GGM.KoptekstenGenummerd.Label" DefaultValue="Kopteksten genummerd" />
+        <bt:String id="GGM.Koptekst1Genummerd.Label" DefaultValue="Koptekst 1 (1.)" />
+        <bt:String id="GGM.Koptekst2Genummerd.Label" DefaultValue="Koptekst 2 (1.1)" />
+        <bt:String id="GGM.Koptekst3Genummerd.Label" DefaultValue="Koptekst 3 (1.1.1)" />
+        <bt:String id="GGM.Koptekst4Genummerd.Label" DefaultValue="Koptekst 4 (1.1.1.1)" />
+        <bt:String id="GGM.Instellen.Label" DefaultValue="Instellen" />
+        <bt:String id="GGM.StijlenInstalleren.Label" DefaultValue="Stijlen installeren" />
+        <bt:String id="GGM.Vernummeren.Label" DefaultValue="Vernummeren" />
+        <bt:String id="GGM.Help.Label" DefaultValue="Help" />
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="GetStarted.Description" DefaultValue="Gebruik het tabblad 'Gemeente Gooise Meren' voor Titel, Standaardtekst en Kopteksten - ook in Word Online." />
+        <bt:String id="GGM.OpenTaskpane.Tooltip" DefaultValue="Open het taakvenster met dezelfde knoppen." />
+        <bt:String id="GGM.Titel.Tooltip" DefaultValue="Pas de Titel-stijl toe (Corbel 18 vet)." />
+        <bt:String id="GGM.Standaardtekst.Tooltip" DefaultValue="Pas de standaardtekststijl toe (Corbel 11)." />
+        <bt:String id="GGM.Kopteksten.Tooltip" DefaultValue="Pas een koptekststijl toe, zonder automatische nummering." />
+        <bt:String id="GGM.KoptekstenGenummerd.Tooltip" DefaultValue="Pas een koptekststijl toe mét automatische nummering (1. / 1.1 / 1.1.1 / 1.1.1.1)." />
+        <bt:String id="GGM.StijlenInstalleren.Tooltip" DefaultValue="Installeer/herstel de gemeentelijke stijlen in dit document (gebeurt ook automatisch bij eerste gebruik van een stijlknop)." />
+        <bt:String id="GGM.Vernummeren.Tooltip" DefaultValue="Werk de nummering (1. / 1.1 / 1.1.1 / 1.1.1.1) in het hele document bij - gebruik dit na het verplaatsen of verwijderen van kopteksten." />
+        <bt:String id="GGM.Help.Tooltip" DefaultValue="Open het taakvenster met uitleg over alle knoppen." />
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gemeente Gooise Meren</title>
+  <link rel="stylesheet" href="taskpane.css" />
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+</head>
+<body>
+  <header class="ggm-header">
+    <div class="ggm-logo">G</div>
+    <div>
+      <h1>Gemeente Gooise Meren</h1>
+      <p class="ggm-subtitle">Tekststijlen voor Word - ook in Word Online</p>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <button id="btnStijlenInstalleren" class="ggm-btn ggm-btn-primary">Stijlen installeren / herstellen</button>
+      <p class="ggm-hint">Gebeurt ook automatisch zodra je voor het eerst een stijlknop gebruikt in een document.</p>
+      <p id="statusMessage" class="ggm-status" role="status"></p>
+    </section>
+
+    <section>
+      <h2>Tekststijlen</h2>
+      <div class="ggm-row">
+        <button class="ggm-btn" data-action="titel">Titel</button>
+        <button class="ggm-btn" data-action="standaardtekst">Standaardtekst</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Kopteksten</h2>
+      <div class="ggm-row">
+        <button class="ggm-btn" data-action="koptekst1">Koptekst 1</button>
+        <button class="ggm-btn" data-action="koptekst2">Koptekst 2</button>
+        <button class="ggm-btn" data-action="koptekst3">Koptekst 3</button>
+      </div>
+      <div class="ggm-row">
+        <button class="ggm-btn" data-action="koptekst4">Koptekst 4</button>
+        <button class="ggm-btn" data-action="koptekst5">Koptekst 5</button>
+        <button class="ggm-btn" data-action="koptekst6">Koptekst 6</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Kopteksten genummerd</h2>
+      <div class="ggm-row">
+        <button class="ggm-btn" data-action="koptekst1Genummerd">Koptekst 1 (1.)</button>
+        <button class="ggm-btn" data-action="koptekst2Genummerd">Koptekst 2 (1.1)</button>
+      </div>
+      <div class="ggm-row">
+        <button class="ggm-btn" data-action="koptekst3Genummerd">Koptekst 3 (1.1.1)</button>
+        <button class="ggm-btn" data-action="koptekst4Genummerd">Koptekst 4 (1.1.1.1)</button>
+      </div>
+      <div class="ggm-row">
+        <button class="ggm-btn" data-action="vernummeren">Vernummeren</button>
+      </div>
+      <p class="ggm-hint">De nummering wordt automatisch bijgewerkt zodra je een genummerde knop gebruikt. Heb je kopteksten verplaatst of verwijderd? Klik dan op "Vernummeren" om alles te laten kloppen.</p>
+    </section>
+
+    <section>
+      <h2>Over deze add-in</h2>
+      <p class="ggm-hint">
+        Deze taakvenster-knoppen doen hetzelfde als de knoppen op het tabblad
+        "Gemeente Gooise Meren" - handig als dat tabblad even niet in beeld is,
+        of tijdens het testen. Normaal gebruik je gewoon het tabblad zelf.
+      </p>
+    </section>
+  </main>
+
+  <script src="../shared/ggm-actions.js"></script>
+  <script src="taskpane.js"></script>
+</body>
+</html>

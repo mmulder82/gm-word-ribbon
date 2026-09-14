@@ -1,0 +1,13 @@
+{
+  "name": "ggm-word-addin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Word Office Add-in die het 'Gemeente Gooise Meren' ribbon-tabblad nabouwt, zodat het ook in Word Online werkt.",
+  "scripts": {
+    "serve": "http-server . -p 3000 -c-1",
+    "build-icons": "python3 scripts/make_icons.py"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

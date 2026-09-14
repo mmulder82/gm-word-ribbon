@@ -1,0 +1,126 @@
+:root {
+  --ggm-brand: #441d42;
+  --ggm-brand-light: #f3e9f2;
+  --ggm-text: #1f1f1f;
+  --ggm-border: #ddd0dc;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Corbel, "Segoe UI", Calibri, Arial, sans-serif;
+  color: var(--ggm-text);
+  background: #ffffff;
+  font-size: 13px;
+}
+
+.ggm-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--ggm-brand);
+  color: #ffffff;
+}
+
+.ggm-logo {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.ggm-header h1 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.ggm-subtitle {
+  margin: 2px 0 0;
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+main {
+  padding: 12px 16px 32px;
+}
+
+section {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--ggm-border);
+}
+
+section h2 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ggm-brand);
+  margin: 0 0 8px;
+}
+
+.ggm-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.ggm-btn {
+  flex: 1 1 auto;
+  min-width: 110px;
+  padding: 8px 10px;
+  border: 1px solid var(--ggm-border);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--ggm-text);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.ggm-btn:hover {
+  background: var(--ggm-brand-light);
+  border-color: var(--ggm-brand);
+}
+
+.ggm-btn:active {
+  transform: translateY(1px);
+}
+
+.ggm-btn-primary {
+  width: 100%;
+  background: var(--ggm-brand);
+  color: #ffffff;
+  border-color: var(--ggm-brand);
+  font-weight: 600;
+  padding: 10px;
+}
+
+.ggm-btn-primary:hover {
+  opacity: 0.9;
+  background: var(--ggm-brand);
+}
+
+.ggm-hint {
+  font-size: 11px;
+  color: #666;
+  margin: 6px 0 0;
+  line-height: 1.4;
+}
+
+.ggm-status {
+  min-height: 16px;
+  font-size: 12px;
+  margin: 8px 0 0;
+  color: var(--ggm-brand);
+}
+
+.ggm-status.error {
+  color: #b3261e;
+}
