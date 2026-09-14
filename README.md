@@ -85,6 +85,48 @@ Deze v4-versie vermijdt beide problemen bewust:
   tabblad of het taakvenster) om de nummers weer kloppend te maken - dat
   gebeurt niet vanzelf zoals bij Word's ingebouwde outline-nummering.
 
+## Word's eigen stijlen (Normaal, Kop 1-9, ...) neutraliseren
+
+Om te voorkomen dat je per ongeluk een van Word's eigen ingebouwde stijlen
+te pakken krijgt en zo buiten Corbel om typt, doet de knop **"Stijlen
+installeren"** meer dan alleen onze eigen stijlen aanmaken: hij overschrijft
+óók Word's eigen ingebouwde stijlen, zoals die in Word Online's
+stijlengalerij staan:
+
+- **"Normaal"** (soms "Standaard" in oudere Word-versies - beide worden
+  geprobeerd) krijgt dezelfde opmaak als Standaardtekst; **"Kop 1"** t/m
+  **"Kop 9"** krijgen dezelfde opmaak als de overeenkomstige Koptekst
+  (Kop 7-9 hebben geen eigen knop, die krijgen dezelfde opmaak als
+  Koptekst 6).
+- Alle overige stijlen uit Word Online's standaardgalerij - **Geen
+  afstand, Ondertitel, Nadruk, Sterk, Citaat, Subtiele verwijzing,
+  Intensieve verwijzing, Titel van boek, Lijstalinea** - krijgen alléén
+  hun lettertype overschreven naar Corbel; hun eigen grootte, kleur,
+  cursief/vet etc. blijft ongemoeid (dat was hier ook alles wat gevraagd
+  was: "als lettertype Corbel te hebben").
+
+Pak je per ongeluk toch een van deze ingebouwde stijlen, dan staat de tekst
+dus nog steeds (in elk geval) in Corbel.
+
+**Belangrijke beperking, eerlijk gezegd:** er bestaat geen ondersteunde
+manier in de Word JavaScript API om een ingebouwde stijl echt te
+verwijderen, of om Word's eigen documentbeveiliging "Opmaak beperken tot
+geselecteerde stijlen" aan te zetten (dát zou pas echt voorkomen dat de
+andere stijlen te kiezen zijn) - dat zit domweg niet in de API die een
+add-in tot zijn beschikking heeft. Wat de add-in wél probeert, als extra,
+best-effort stap: de ingebouwde stijlen uit Word's "Snelstijlen"-galerie in
+het lint halen. Dat lukt mogelijk niet in elke Word Online-versie (dit
+project is al eerder tegen een niet-ondersteunde stijl-eigenschap
+aangelopen, zie de architectuurgeschiedenis hieronder) - en zelfs als het
+lukt, blijven alle ingebouwde stijlen gewoon nog vindbaar en te kiezen via
+het volledige "Stijlen"-deelvenster (Ctrl+Alt+Shift+S). Kortom: dit is een
+praktische vangnet-oplossing (altijd Corbel, ook bij een verkeerde keuze),
+geen echte, harde blokkade van de andere stijlen.
+
+Klik "Stijlen installeren" dus één keer per document (het maakt niet uit of
+dat vóór of na het typen is - bestaande tekst met een ingebouwde stijl
+verandert gewoon mee).
+
 ## Waarom deze knoppen en niet meer
 
 De vorige, bredere versie (Klembord, Tabelstijlen, Taal, Bijhouden,

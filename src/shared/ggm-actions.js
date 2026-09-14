@@ -30,6 +30,26 @@
 // Still only `.font` being set, so this doesn't reintroduce the
 // `paragraphFormat` problem above.
 //
+// v4.2 (14 sep) - Mark asked for Word's own built-in styles (Standaard/
+// Normaal, Kop 1-9, ...) to no longer be available/relevant, so he's
+// always typing in Corbel and never picks one of those by accident. There
+// is no supported Word JS API to actually delete or hide a built-in
+// style, and no way from Office.js to turn on Word's own "Opmaak
+// beperken tot geselecteerde stijlen" document protection (which is the
+// Word feature that would do this properly) - so this is a best-effort
+// mitigation, not a hard guarantee, see neutralizeBuiltInStyle() below
+// and the README.
+//
+// v4.3 (14 sep) - Mark sent screenshots of Word Online's actual style
+// gallery. Two corrections/additions from that: (1) the built-in Normal
+// style is called "Normaal" there, not "Standaard" as assumed in v4.2 -
+// both names are now tried; (2) added every other style shown in the
+// gallery (Geen afstand, Ondertitel, Nadruk, Sterk, Citaat, Subtiele
+// verwijzing, Intensieve verwijzing, Titel van boek, Lijstalinea). Mark
+// only asked for the font on these to be Corbel, not a different size/
+// color/emphasis, so only `font.name` is overridden for this group - see
+// MISC_BUILTIN_STYLE_NAMES below.
+//
 // The numbered look for Koptekst 1-4 (1. / 1.1 / 1.1.1 / 1.1.1.1) still
 // has no equivalent in the Word JS API (no supported way to link a style
 // to a multilevel-list definition), so it's computed by this add-in and
@@ -134,9 +154,116 @@ GGM.ensureAllStyles = async function (context) {
   }
 };
 
+// -- Neutraliseren van Word's eigen ingebouwde stijlen ------------------------
+// Word's ingebouwde stijlen (Standaard, Kop 1-9, ...) kunnen niet via de
+// Word JS API worden verwijderd of via documentbeveiliging worden
+// geblokkeerd - dat kan alleen "echt" via Word's eigen "Opmaak beperken tot
+// geselecteerde stijlen", wat niet in de add-in-API zit. In plaats daarvan
+// wordt hier hetzelfde lettertype/formaat/kleur als de bijbehorende
+// Koptekst/Standaardtekst-stijl over de ingebouwde stijl heen gezet, zodat
+// een per ongeluk gekozen ingebouwde stijl toch als Corbel wordt getoond.
+// Deze namen gaan uit van een Nederlandstalige Word-interface (net als de
+// rest van dit document) - staat Word in een andere taal, dan wordt de
+// stijl simpelweg niet gevonden (isNullObject) en gebeurt er niets, nooit
+// een harde fout.
+
+// "Normal" heeft in het Nederlands twee namen gehad afhankelijk van de
+// Word-versie ("Normaal" in recente Word/Word Online - bevestigd via
+// Mark's screenshot van de stijlengalerij - "Standaard" in oudere
+// versies). Beide proberen is onschadelijk: welke niet bestaat, wordt
+// simpelweg overgeslagen (isNullObject).
+const BUILTIN_NORMAL_NAMES = ["Normaal", "Standaard"];
+const BUILTIN_HEADING_NAMES = {
+  1: "Kop 1", 2: "Kop 2", 3: "Kop 3", 4: "Kop 4", 5: "Kop 5",
+  6: "Kop 6", 7: "Kop 7", 8: "Kop 8", 9: "Kop 9",
+};
+// Kop 7-9 hebben geen eigen Koptekst-knop/spec; die krijgen voor de
+// zekerheid dezelfde opmaak als Koptekst 6 (Corbel 11, huisstijlkleur,
+// geen extra nadruk) - beter dan een ander lettertype laten staan.
+const HEADING_FALLBACK_SPEC = KOPTEKST_SPECS[6];
+
+// De rest van de stijlen die Word Online standaard in zijn stijlengalerij
+// toont (bevestigd via Mark's screenshots): een mix van alinea- en
+// tekenstijlen. Mark vroeg hier specifiek alleen om het lettertype Corbel
+// - niet om een andere maat/kleur/vet/cursief - dus deze krijgen alleen
+// hun lettertypenaam overschreven; hun eigen overige opmaak (grootte,
+// cursief, kleur, ...) blijft ongemoeid. `Word.Font.set()` past alleen de
+// eigenschappen aan die je meegeeft, dus { name: "Corbel" } laat de rest
+// van elke stijl met rust.
+const MISC_BUILTIN_STYLE_NAMES = [
+  "Geen afstand", // No Spacing
+  "Ondertitel", // Subtitle
+  "Nadruk", // Emphasis (tekenstijl)
+  "Sterk", // Strong (tekenstijl)
+  "Citaat", // Quote
+  "Subtiele verwijzing", // Subtle Reference (tekenstijl)
+  "Intensieve verwijzing", // Intense Reference (tekenstijl)
+  "Titel van boek", // Book Title (tekenstijl)
+  "Lijstalinea", // List Paragraph
+];
+const FONT_ONLY_PATCH = { name: FONT_NAME };
+
+/** (Re)apply font to one of Word's own built-in styles, but only if it
+ *  already exists in the document - never create it under that name (that
+ *  would risk creating a wrong *custom* style if the lookup ever missed
+ *  for some reason, e.g. a non-Dutch display language). Also makes a
+ *  best-effort, separately try/caught attempt to drop it from Word's
+ *  Quick Styles gallery in the ribbon (`quickStyle`) - this property isn't
+ *  guaranteed supported in every Word Online build (this project has hit
+ *  an unsupported Word.Style property before, see the paragraphFormat
+ *  note above), so it must never be allowed to block the font fix, and a
+ *  failure here is not a real problem: the style still renders correctly,
+ *  it just may still be visible in the gallery. Even when it works, this
+ *  only affects the Quick Styles gallery in the ribbon, not the full
+ *  "Stijlen"-deelvenster (Ctrl+Alt+Shift+S), where every built-in style
+ *  remains selectable by name regardless. */
+async function neutralizeBuiltInStyle(context, name, font) {
+  try {
+    const styles = context.document.getStyles();
+    const style = styles.getByNameOrNullObject(name);
+    style.load("isNullObject");
+    await context.sync();
+    if (style.isNullObject) return;
+    style.font.set(font);
+    await context.sync();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error("Kon ingebouwde stijl '" + name + "' niet overschrijven:", e);
+  }
+
+  try {
+    const styles = context.document.getStyles();
+    const style = styles.getByNameOrNullObject(name);
+    style.load("isNullObject");
+    await context.sync();
+    if (style.isNullObject) return;
+    style.quickStyle = false;
+    await context.sync();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error("Kon ingebouwde stijl '" + name + "' niet uit de snelstijlengalerie halen (niet kritiek):", e);
+  }
+}
+
+GGM.neutralizeBuiltInStyles = async function (context) {
+  for (const name of BUILTIN_NORMAL_NAMES) {
+    await neutralizeBuiltInStyle(context, name, STANDAARD_SPEC);
+  }
+  for (const level of [1, 2, 3, 4, 5, 6]) {
+    await neutralizeBuiltInStyle(context, BUILTIN_HEADING_NAMES[level], KOPTEKST_SPECS[level]);
+  }
+  for (const level of [7, 8, 9]) {
+    await neutralizeBuiltInStyle(context, BUILTIN_HEADING_NAMES[level], HEADING_FALLBACK_SPEC);
+  }
+  for (const name of MISC_BUILTIN_STYLE_NAMES) {
+    await neutralizeBuiltInStyle(context, name, FONT_ONLY_PATCH);
+  }
+};
+
 GGM.stijlenInstalleren = async function () {
   await Word.run(async (context) => {
     await GGM.ensureAllStyles(context);
+    await GGM.neutralizeBuiltInStyles(context);
   });
 };
 
